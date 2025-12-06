@@ -20,7 +20,7 @@ jobs:
           - { n: 323, phi: 288, reduction: "φ/2" }
           - { n: 667, phi: 616, reduction: "φ/2" }
           - { n: 1003, phi: 928, reduction: "φ/4" }
-          - { n: 1517, phi: 1480, reduction: "φ/6" }
+          - { n: 1517, phi: 1440, reduction: "φ/6" }
           - { n: 2501, phi: 2400, reduction: "φ/20" }
           - { n: 3007, phi: 2880, reduction: "φ/6" }
           - { n: 3131, phi: 3000, reduction: "φ/20" }
