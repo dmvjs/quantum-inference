@@ -24,9 +24,9 @@ Quantum Integer Factorization: N = 323
 Algorithm: Shor's period-finding with adaptive multi-basis search
 Parameters: 16 bases, 288k shots/basis
 
-Testing smooth bases: 15, 14, 10, 9...
+Testing smooth bases: 2, 4, 8, 3, 6, 12, 16, 24, 48, 32, and 6 more...
 
-Base a=15:
+Base a=2:
   Early detection: r=72 after 10000 shots (saved 278000 shots)
   Period detected: r=72 (confidence: 90.000%)
   Factor extraction: gcd(305-1, 323) = 19
@@ -202,20 +202,16 @@ For patterns under 100 steps, this creates 50-3,000× speedups. For longer patte
 
 ## How It Works (Technical Details)
 
-1,390 lines of TypeScript simulating:
+TypeScript quantum simulation with:
 
-**Quantum simulation:**
+**Quantum effects:**
 - Quantum state superposition and measurement with 85% noise
 - Quantum state decay over time (simulates hardware imperfections)
 
-**Smart optimizations:**
+**Optimizations:**
 - **Progressive pattern testing:** Tests short pattern lengths first (divisors of φ under 100), stops immediately when found
 - **Efficient measurement allocation:** Scales measurements linearly with problem size (not exponentially)
-- **Smooth number selection:** Tests simple starting bases first (9, 15, 12, 14...) before trying random numbers
+- **Smooth number selection:** Tries smoothest bases first (2, 3, 4, 5, 6, 8, 10...) based on small prime factors
 - **Statistical inference:** Uses Bayesian statistics to find patterns in noisy measurements, constrained to likely divisors of φ(N)
 
 The simulation includes realistic quantum computer behavior: random measurement errors and quantum coherence decay, matching what you'd see on current quantum hardware.
-
----
-
-**TypeScript • 1,390 lines • 4 verified test cases • Open source**

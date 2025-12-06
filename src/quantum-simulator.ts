@@ -613,49 +613,8 @@ export class QuantumSimulator {
     // Sort by smoothness descending (smooth = high score = good)
     allBases.sort((x, y) => y.score - x.score);
 
-    // MIDDLE-OUT CHAOS: Start with medium smooth bases, spiral outward chaotically
-    // Key insight: winning bases (18,20,24,30,45) are in the middle range (10-35)
-    // Not in tiny (2-5) or huge (40-48) ranges!
-
-    const sortedBases = allBases.map(x => x.base);
-
-    // Find middle index and create middle-out ordering
-    const midIdx = Math.floor(sortedBases.length / 2);
-    const orderedBases: number[] = [];
-
-    // Lorenz chaos for spiral direction
-    let x = 0.5, y = 0.5, z = 0.5;
-    let leftIdx = midIdx - 1;
-    let rightIdx = midIdx;
-
-    // Add middle base first
-    if (midIdx < sortedBases.length) orderedBases.push(sortedBases[midIdx]);
-
-    // Spiral outward with chaos deciding left vs right
-    while (orderedBases.length < Math.min(adaptiveAttempts, sortedBases.length)) {
-      // Lorenz step
-      const dt = 0.01, sigma = 10, rho = 28, beta = 8/3;
-      x += sigma * (y - x) * dt;
-      y += (x * (rho - z) - y) * dt;
-      z += (x * y - beta * z) * dt;
-
-      // Chaos decides: go left or right?
-      const chaos = (Math.abs(x) % 10) / 10;
-      const goLeft = chaos < 0.5;
-
-      if (goLeft && leftIdx >= 0) {
-        orderedBases.push(sortedBases[leftIdx]);
-        leftIdx--;
-      } else if (rightIdx < sortedBases.length) {
-        orderedBases.push(sortedBases[rightIdx]);
-        rightIdx++;
-      } else if (leftIdx >= 0) {
-        orderedBases.push(sortedBases[leftIdx]);
-        leftIdx--;
-      }
-    }
-
-    const selectedBases = orderedBases.slice(0, adaptiveAttempts);
+    // Try smoothest bases first (most likely to produce short periods)
+    const selectedBases = allBases.map(x => x.base).slice(0, adaptiveAttempts);
 
     // Display selected smooth bases
     const firstFew = selectedBases.slice(0, Math.min(10, selectedBases.length));
