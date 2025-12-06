@@ -25,21 +25,21 @@ Empirical: r ~ φ(N)/α    → shots ∝ (φ/α)²  → φ_max = 3240 at 2.4M sh
 
 **Solution**: Middle-out Lorenz chaos search through smoothness-ranked candidates.
 
-```typescript
-// 1. Rank bases by smoothness (products of small primes)
-smoothness(a) = Σ weight(p_i) for a = Π p_i^k_i
-  where weight(2) = weight(3) = 1, weight(5) = weight(7) = 2, ...
+```
+1. Rank bases by smoothness (products of small primes)
+   smoothness(a) = Σ weight(p_i) for a = Π p_i^k_i
+   where weight(2) = weight(3) = 1, weight(5) = weight(7) = 2, ...
 
-// 2. Initialize at median (avoids trivial a=2, sparse a>>20)
-start_index = smooth_bases.length / 2
+2. Initialize at median (avoids trivial a=2, sparse a>>20)
+   start_index = smooth_bases.length / 2
 
-// 3. Lorenz chaos explores neighborhood
-σ=10, ρ=28, β=8/3
-dx/dt = σ(y - x)
-dy/dt = x(ρ - z) - y
-dz/dt = xy - βz
+3. Lorenz chaos explores neighborhood
+   σ=10, ρ=28, β=8/3
+   dx/dt = σ(y - x)
+   dy/dt = x(ρ - z) - y
+   dz/dt = xy - βz
 
-next_base ← smooth_bases[median ± chaos_offset(x,y,z)]
+   next_base ← smooth_bases[median ± chaos_offset(x,y,z)]
 ```
 
 **Performance**: Finds φ/6 to φ/20 bases in first 3-5 attempts (90% success rate).
