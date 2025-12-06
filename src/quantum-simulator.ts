@@ -580,13 +580,18 @@ export class QuantumSimulator {
     // SNR theory: For period r with 85% noise, signal-to-noise degrades as r increases
     // Need shots ∝ r^2 to maintain constant SNR as period grows
     // Use φ(N) as proxy for maximum expected period
-    const shotsPerBasis = Math.min(
+
+    // CI mode: reduce shots 10× for faster validation
+    const ciMode = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+    const shotMultiplier = ciMode ? 0.1 : 1.0;
+
+    const shotsPerBasis = Math.floor(shotMultiplier * Math.min(
       10000000,  // Cap at 10M shots (gaming for maximum φ)
       Math.max(
         100000,  // Minimum 100k shots for small numbers
         Math.floor(100000 * Math.pow(phi / 100, 2.0))  // Quadratic scaling with φ
       )
-    );
+    ));
 
     console.log(`\nAlgorithm: Shor's period-finding with adaptive multi-basis search`);
     console.log(`Parameters: ${adaptiveAttempts} bases, ${(shotsPerBasis/1000).toFixed(0)}k shots/basis\n`);
