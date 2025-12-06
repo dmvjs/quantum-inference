@@ -1,6 +1,8 @@
 # Period Divisor Exploitation via Smooth Basis Selection in Noisy Shor's Algorithm
 
-Empirical analysis demonstrates that smooth bases in Shor's quantum factoring algorithm produce periods as divisors of φ(N) rather than approaching φ(N) itself. This phenomenon reduces measurement requirements by 36-400× relative to random basis selection under realistic NISQ noise conditions.
+**At 100k quantum measurements: factor φ≤6320 instead of φ≤316 (20× improvement)**
+
+Smooth basis selection in Shor's algorithm produces periods as divisors of φ(N) rather than approaching φ(N) itself, reducing measurement requirements by 36-400× relative to random basis selection under realistic NISQ noise conditions (85% measurement error, 5ms T₂ coherence).
 
 ## Observed Pattern
 
