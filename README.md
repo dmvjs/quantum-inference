@@ -15,12 +15,12 @@ Three breakthroughs make Shor's algorithm deterministic on noisy hardware:
 | 667 | 23×29 | 616 | 308 | 14% | period ≈ φ/2 |
 | 899 | 29×31 | 840 | 420 | 7% | period = φ/2 |
 | 1003 | 17×59 | 928 | 232 | 18% | smooth φ → short period |
-| 1517 | 37×41 | 1480 | 240 | 6% | **φ > 1000 works!** |
+| 1517 | 37×41 | 1480 | 240 | 6% | period divisor effect |
 
-**Breakthrough**: Elliott Algorithm breaks 1000 barrier
-**Key Discovery**: Smooth bases have periods << φ, enabling φ=1480 at 2.4M shots
-**Theoretical**: shots ∝ φ² predicts φ ≤ 576
-**Actual**: φ ≤ 1480+ via smooth period exploitation
+**Observation**: Smooth bases yield periods < φ/2 in practice
+**Theoretical limit**: shots ∝ φ² predicts φ ≤ 576 at 2.4M shots
+**Empirical result**: φ ≤ 1480 via basis selection (period=240 for N=1517)
+**Interpretation**: Middle-out search exploits period divisor structure
 
 ## Noise Model (Realistic)
 
@@ -76,9 +76,9 @@ Factor Extraction          [gcd(a^(r/2)±1, N)]
 
 ```bash
 npm install
-npm start 323      # Small: 323 = 17 × 19 (φ=288)
-npm start 1003     # **BROKE 1000**: 1003 = 17 × 59 (φ=928, 18% confidence!)
-npm start 1517     # **RECORD**: 1517 = 37 × 41 (φ=1480, period=240)
+npm start 323      # 323 = 17 × 19 (φ=288)
+npm start 1003     # 1003 = 17 × 59 (φ=928)
+npm start 1517     # 1517 = 37 × 41 (φ=1480, period=240)
 ```
 
 ## Code
@@ -98,15 +98,13 @@ Core innovations:
 - `batchedExecution()`: Realistic drift + recalibration model
 - `adaptiveShotAllocation()`: Scale shots ∝ φ² for consistent SNR
 
-## Scaling & Breakthrough
+## Scaling
 
-**Initial**: φ(N) ≤ 288 at 600k shots (φ² scaling law)
-**Breakthrough**: φ(N) ≤ 1480+ at 2.4M shots (smooth period exploitation)
-**Key insight**: Elliott Algorithm finds periods << φ via smooth bases
-**Performance**: 4× shots enables φ > 5× higher (not 2× as theory predicts)
-**Highest**: 1517 = 37×41 deterministically factored (φ=1480, period=240)
-
-RSA-2048 gap: ~10^614 orders of magnitude remaining
+**Initial**: φ(N) ≤ 288 at 600k shots
+**Current**: φ(N) ≤ 1480 at 2.4M shots (4× shot increase)
+**Mechanism**: Smooth basis search finds short periods (divisors of φ)
+**Example**: N=1517 (φ=1480) detected via period=240 using base a=14
+**Limitation**: Still ~10^614 orders of magnitude from RSA-2048
 
 ## Why It Matters
 
@@ -114,6 +112,6 @@ First deterministic Shor's algorithm on 85% noise hardware. Elliott Algorithm + 
 
 ---
 
-**BREAKTHROUGH: Factored 1517** | φ(N) ≤ 1480+ | 85% noise | Elliott Algorithm breaks 1000
+**Deterministic quantum factoring** | φ(N) ≤ 1480 | 85% noise | 2.4M shots
 
 *Shor, P.W. (1997). SIAM J. Comput. 26(5):1484-1509.*
