@@ -10,11 +10,58 @@ function isPrime(n: number): boolean {
   return true;
 }
 
+function trialDivision(n: number, limit: number = 100000): [number, number] | null {
+  const maxTrial = Math.min(limit, Math.floor(Math.sqrt(n)));
+
+  // Check small primes efficiently
+  if (n % 2 === 0) return [2, n / 2];
+  if (n % 3 === 0) return [3, n / 3];
+
+  // 6k±1 optimization
+  for (let i = 5; i <= maxTrial; i += 6) {
+    if (n % i === 0) return [i, n / i];
+    if (n % (i + 2) === 0) return [i + 2, n / (i + 2)];
+  }
+
+  return null;
+}
+
+function fermatFactorization(n: number, maxIterations: number = 10000): [number, number] | null {
+  // Only works for odd n
+  if (n % 2 === 0) return null;
+
+  let a = Math.ceil(Math.sqrt(n));
+  const b2Max = a * a - n;
+
+  for (let i = 0; i < maxIterations; i++) {
+    const b2 = a * a - n;
+    const b = Math.sqrt(b2);
+
+    if (Number.isInteger(b)) {
+      const p = a - b;
+      const q = a + b;
+      if (p > 1 && q > 1 && p * q === n) {
+        return [p, q];
+      }
+    }
+
+    a++;
+
+    // If a² - n is too large, factors are not close
+    if (a * a - n > n / 4) break;
+  }
+
+  return null;
+}
+
 async function main() {
   const N = process.argv[2] ? parseInt(process.argv[2]) : 21;
 
   console.log(`\nQuantum Integer Factorization: N = ${N}`);
   console.log('='.repeat(50));
+
+  // Classical preprocessing
+  console.log('\n[Classical Preprocessing]');
 
   if (N % 2 === 0) {
     console.log(`Trivial case (even): ${N} = 2 × ${N/2}\n`);
@@ -25,6 +72,36 @@ async function main() {
     console.log(`Prime detected: ${N} cannot be factored\n`);
     return;
   }
+
+  // Trial division (fast for small factors)
+  const trialStart = Date.now();
+  const trialFactors = trialDivision(N, 100000);
+  const trialTime = Date.now() - trialStart;
+
+  if (trialFactors) {
+    console.log(`✓ Trial division: ${N} = ${trialFactors[0]} × ${trialFactors[1]} (${trialTime}ms)`);
+    console.log('='.repeat(50));
+    console.log(`Result: ${N} = ${trialFactors[0]} × ${trialFactors[1]} (classical)\n`);
+    return;
+  } else {
+    console.log(`  Trial division: No factors ≤ ${Math.min(100000, Math.floor(Math.sqrt(N)))} (${trialTime}ms)`);
+  }
+
+  // Fermat's method (fast for close factors)
+  const fermatStart = Date.now();
+  const fermatFactors = fermatFactorization(N, 10000);
+  const fermatTime = Date.now() - fermatStart;
+
+  if (fermatFactors) {
+    console.log(`✓ Fermat's method: ${N} = ${fermatFactors[0]} × ${fermatFactors[1]} (${fermatTime}ms)`);
+    console.log('='.repeat(50));
+    console.log(`Result: ${N} = ${fermatFactors[0]} × ${fermatFactors[1]} (classical)\n`);
+    return;
+  } else {
+    console.log(`  Fermat's method: No close factors (${fermatTime}ms)`);
+  }
+
+  console.log('\n[Quantum Simulation Required]')
 
   const simulator = new QuantumSimulator();
   const maxRetries = 10;

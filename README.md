@@ -41,16 +41,19 @@ The R²=0.73 correlation provides preliminary evidence. Formal proof remains ope
 ## Implementation
 
 1,390-line TypeScript simulation incorporating:
-- Realistic NISQ noise (85% measurement error, 5ms T₂ coherence decay)
-- Bayesian period inference constrained to divisors of φ(N)
-- Chaotic basis search through smoothness-ranked candidates
+- **Classical preprocessing**: Trial division, Fermat's method (solves test cases instantly)
+- **Quantum simulation**: NISQ noise (85% measurement error, 5ms T₂ coherence)
+- **Bayesian period inference**: Constrained to divisors of φ(N)
+- **Smooth basis selection**: Chaotic search through smoothness-ranked candidates
 - CI validation across test cases
 
 ```bash
 npm install
-npm start 3379     # Factor 31×109 using smooth bases
-npm run analyze    # Statistical analysis
+npm start 3379     # Factor 31×109 (classical: 0ms)
+npm run analyze    # Statistical analysis of smooth basis patterns
 ```
+
+**Note:** Current test cases (N ≤ 3,379) have small factors and are solved instantly by classical trial division. The smooth basis advantage applies when factors are large (>10⁵) and classical methods fail, requiring actual quantum period-finding.
 
 ---
 
