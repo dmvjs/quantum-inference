@@ -25,51 +25,14 @@ export class QuantumSimulator {
   }
 
   private refreshEntropyPool() {
+    // OPTIMIZED: Use only crypto CSPRNG, skip expensive entropy gathering
+    // The extra entropy sources (timing jitter, GC, stack depth) add negligible value
+    // but consume significant CPU time when called frequently
     this.entropyPool = [];
 
-    // Source 1: Crypto CSPRNG (hardware RNG + CPU jitter) - BEST
-    const cryptoBytes = crypto.randomBytes(1024);
+    const cryptoBytes = crypto.randomBytes(512); // Reduced from 1024
     for (let i = 0; i < cryptoBytes.length; i++) {
       this.entropyPool.push(cryptoBytes[i] / 255);
-    }
-
-    // Source 2: High-res timing jitter (CPU quantum fluctuations)
-    const start = performance.now();
-    for (let i = 0; i < 100; i++) {
-      const timing = performance.now() - start;
-      const jitter = (timing * 1000000) % 1;  // Nanosecond-level noise
-      this.entropyPool.push(jitter);
-    }
-
-    // Source 3: Process hrtime (true nanosecond entropy)
-    const hrtime = process.hrtime.bigint();
-    const timeEntropy = Number(hrtime % 1000000n) / 1000000;
-    this.entropyPool.push(timeEntropy);
-
-    // Source 4: Memory address randomness (ASLR)
-    const obj = {};
-    const addressEntropy = (Object.keys(obj).length + Date.now()) % 1000 / 1000;
-    this.entropyPool.push(addressEntropy);
-
-    // Source 5: GC timing (memory operation jitter)
-    if (global.gc) {
-      const gcStart = performance.now();
-      global.gc();
-      const gcTime = performance.now() - gcStart;
-      this.entropyPool.push((gcTime * 1000) % 1);
-    }
-
-    // Source 6: Stack depth entropy (execution state)
-    let depth = 0;
-    try {
-      (function recurse(): any { depth++; return recurse(); })();
-    } catch { /* Stack overflow caught */ }
-    this.entropyPool.push((depth % 1000) / 1000);
-
-    // Shuffle with crypto
-    for (let i = this.entropyPool.length - 1; i > 0; i--) {
-      const j = crypto.randomInt(0, i + 1);
-      [this.entropyPool[i], this.entropyPool[j]] = [this.entropyPool[j], this.entropyPool[i]];
     }
 
     this.entropyIndex = 0;
@@ -100,26 +63,6 @@ export class QuantumSimulator {
     return (this.lorenzChaos() + this.logisticChaos()) / 2;
   }
 
-  // Quantum noise generator (simulates decoherence, gate errors, measurement errors)
-  private addQuantumNoise(value: number, noiseLevel: number): number {
-    // Decoherence: exponential decay from quantum to classical
-    const decoherence = Math.exp(-this.quantumRandom() * noiseLevel);
-
-    // Gate error: bit flip probability
-    const gateError = this.quantumRandom() < (noiseLevel * 0.01);
-
-    // Measurement error: readout noise
-    const measurementNoise = (this.quantumRandom() - 0.5) * noiseLevel * 2;
-
-    let result = value;
-    if (gateError) {
-      result = result ^ (1 << Math.floor(this.quantumRandom() * 8));
-    }
-
-    result = Math.floor(result * decoherence + measurementNoise);
-
-    return result;
-  }
   // Continued fractions algorithm for better period extraction
   private continuedFraction(numerator: number, denominator: number, maxDenom: number): [number, number] {
     if (numerator === 0) return [0, 1];
@@ -149,46 +92,6 @@ export class QuantumSimulator {
     }
 
     return [p, q];
-  }
-
-  // Progressive sampling: quick check before committing to full shot count
-  private quickCheck(N: number, a: number): { promising: boolean; earlyPeriod: number | null } {
-    const quickShots = 5000;
-    const phaseBits = Math.min(Math.ceil(2 * Math.log2(N)), 20);
-    const funcBits = Math.ceil(Math.log2(N));
-
-    let period = 1;
-    let value = a % N;
-    while (value !== 1 && period < N) {
-      value = (value * a) % N;
-      period++;
-    }
-
-    const histogram: Record<string, number> = {};
-    const T2 = 5000;
-
-    // Circuit depth-based coherence (constant per shot)
-    const circuitDepth = phaseBits * Math.log2(N);
-    const circuitTime_us = circuitDepth * 0.1;
-    const decoherenceFactor = Math.exp(-circuitTime_us / T2);
-    const baseCoherence = 0.15 * decoherenceFactor;
-
-    for (let shot = 0; shot < quickShots; shot++) {
-      const coherentMeasurement = this.quantumRandom() < baseCoherence;
-
-      if (coherentMeasurement) {
-        const k = Math.floor(this.quantumRandom() * period);
-        const phase = k / period;
-        let measured_value = Math.round(phase * Math.pow(2, phaseBits)) % Math.pow(2, phaseBits);
-        histogram[measured_value.toString()] = (histogram[measured_value.toString()] || 0) + 1;
-      }
-    }
-
-    // Check if any measurement has >0.5% of shots (signal present)
-    const maxCount = Math.max(...Object.values(histogram));
-    const promising = maxCount > quickShots * 0.005;
-
-    return { promising, earlyPeriod: promising ? period : null };
   }
 
   // Progressive period testing: try to detect period with minimal shots
@@ -346,8 +249,8 @@ export class QuantumSimulator {
 
         histogram[measurement] = (histogram[measurement] || 0) + 1;
 
-        // Refresh entropy pool periodically
-        if (shot % 10000 === 0 && shot > 0) {
+        // Refresh entropy pool less frequently (optimization)
+        if (shot % 50000 === 0 && shot > 0) {
           this.refreshEntropyPool();
         }
       } // End inner loop (shotInBatch)
@@ -659,11 +562,14 @@ export class QuantumSimulator {
     const ciMode = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
     const shotMultiplier = ciMode ? 0.1 : 1.0;
 
+    // OPTIMIZED: Linear scaling instead of quadratic
+    // With progressive testing catching small periods early, we don't need O(φ²)
+    // Use linear scaling: shots ∝ φ with conservative constant
     const shotsPerBasis = Math.floor(shotMultiplier * Math.min(
-      10000000,  // Cap at 10M shots (gaming for maximum φ)
+      10000000,  // Cap at 10M shots
       Math.max(
         100000,  // Minimum 100k shots for small numbers
-        Math.floor(100000 * Math.pow(phi / 100, 2.0))  // Quadratic scaling with φ
+        Math.floor(phi * 1000)  // LINEAR scaling: 1k shots per unit of φ
       )
     ));
 
