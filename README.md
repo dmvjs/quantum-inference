@@ -28,9 +28,9 @@ Validated across 8 semiprimes spanning φ=288 to φ=3240 at 85% measurement erro
 
 Statistical analysis reveals R²=0.73 correlation between basis smoothness and logarithmic period reduction across 47 test cases.
 
-## Methodology
+## The Elliott Algorithm
 
-Basis selection employs a middle-out Lorenz attractor search through smoothness-ranked candidates:
+Basis selection via middle-out Lorenz attractor search through smoothness-ranked candidates:
 
 1. Candidates ranked by smoothness metric: Σ weight(pᵢ) for a = Π pᵢ^kᵢ
 2. Search initialized at median index to balance trivial (a=2) and sparse (a≫20) regions
