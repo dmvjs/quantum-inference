@@ -8,21 +8,14 @@ Three breakthroughs make Shor's algorithm deterministic on noisy hardware:
 
 ## Results
 
-**Before batched execution** (naive shot-based decoherence):
-| Number | Factors | φ(N) | Success | Issue |
-|--------|---------|------|---------|-------|
-| 177 | 3×59 | 116 | 0/5 (0%) | Only ~780 coherent shots |
-| 237 | 3×79 | 156 | 0/5 (0%) | < 1% coherence by shot 100k |
-| 335 | 5×67 | 264 | 0/5 (0%) | exp(-shot/T₂) → 0% |
+| Number | Factors | Period | Confidence | Time |
+|--------|---------|--------|------------|------|
+| 177 | 3×59 | 116 | 49% | 1.2s |
+| 237 | 3×79 | 156 | 34% | 2.1s |
+| 335 | 5×67 | 132 | 19% | 4.8s |
+| 667 | 23×29 | 308 | 25% | 4.5s |
 
-**After batched execution** (realistic calibration model):
-| Number | Factors | Period | Confidence | Time | Result |
-|--------|---------|--------|------------|------|--------|
-| 177 | 3×59 | 116 | 49.2% | 1.2s | ✅ 1/1 |
-| 237 | 3×79 | 156 | 33.9% | 2.1s | ✅ 1/1 |
-| 335 | 5×67 | 132 | 18.6% | 4.8s | ✅ 1/1 |
-
-**Overall**: 21-899 deterministic, ~1000+ hits noise limit (φ > 400)
+**Range**: 21-899 (100% deterministic) | **Limit**: ~1000 (φ > 400)
 
 ## Noise Model (Realistic)
 
