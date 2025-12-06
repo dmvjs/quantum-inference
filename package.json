@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --expose-gc dist/index.js",
+    "analyze": "node analysis.js",
     "verify": "tsc && node --expose-gc dist/verify.js",
     "test-323": "tsc && node --expose-gc dist/test-323.js",
     "benchmark": "tsc && node --expose-gc dist/benchmark.js"

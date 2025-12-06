@@ -581,7 +581,7 @@ export class QuantumSimulator {
     // Need shots ∝ r^2 to maintain constant SNR as period grows
     // Use φ(N) as proxy for maximum expected period
     const shotsPerBasis = Math.min(
-      2400000,  // Cap at 2.4M for φ ≤ 576 (4× higher, following φ² scaling)
+      10000000,  // Cap at 10M shots (gaming for maximum φ)
       Math.max(
         100000,  // Minimum 100k shots for small numbers
         Math.floor(100000 * Math.pow(phi / 100, 2.0))  // Quadratic scaling with φ
