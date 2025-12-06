@@ -1,17 +1,17 @@
-# Smooth Bases Reduce Shor's Algorithm Shot Requirements by 400×
+# 400× Shot Reduction in Noisy Quantum Factoring
 
-**Simulation research finding:** Smooth bases in Shor's algorithm yield predictable period divisors (φ/6 to φ/20), enabling 36-400× shot reduction at 85% noise. Theoretical explanation and real-hardware validation remain open.
+**The finding:** Choosing smooth bases (9=3², 14=2×7) in Shor's algorithm reduces shot requirements by 36-400× compared to random basis selection.
 
-**φ(N)=3240 proven | 5.6× beyond φ² scaling**
+**Why it matters:** Real quantum computers have limited shot budgets (1k-100k shots). Standard approach at 10k shots can only factor trivial numbers (φ≤100). With smooth bases, same budget factors meaningful numbers (φ≤2000).
 
-| Base | Period | Shot Reduction |
-|------|--------|----------------|
-| 9=3² | φ/20 | **400×** |
-| 14=2×7 | φ/6 | **36×** |
+| Base | Period Pattern | Shot Reduction | Example |
+|------|----------------|----------------|---------|
+| **9 (3²)** | **φ/20** | **400×** | 22k shots vs 9M |
+| **14 (2×7)** | **φ/6** | **36×** | 290k shots vs 10M |
 
-**Example:** N=3131 (φ=3000) factored with 22k shots vs 9M shots using random bases.
+**Validation:** 8 semiprimes (φ=288 to φ=3240) factored at 85% noise. Pattern holds consistently.
 
-**Practical impact:** At constrained shot budgets typical on NISQ hardware, smooth basis selection enables factoring numbers 20× larger than φ² scaling predicts.
+**Status:** Simulation research. Theoretical proof and real-hardware validation open.
 
 ## Validated Results
 
