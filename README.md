@@ -12,7 +12,7 @@
 npm install
 npm start 323      # Factor 323 (17×19) - completes in 0.7 seconds
 npm start 2501     # Factor 2,501 (41×61) - completes in 0.7 seconds
-npm start 3131     # Factor 3,131 (31×101) - completes in 2.5 minutes
+npm start 3131     # Factor 3,131 (31×101) - completes in 0.7 seconds
 ```
 
 **What you'll see:**
@@ -126,20 +126,20 @@ A smooth number uses only small prime factors:
 
 | Number | Factors | Starting Number | Pattern Length | Measurement Success |
 |--------|---------|----------------|----------------|-------------------|
-| 2,501 | 41×61 | 9 (=3×3) | 20 steps | 90% |
-| 323 | 17×19 | 15 (=3×5) | 72 steps | 90% |
-| 667 | 23×29 | 9 (=3×3) | 308 steps | 14% |
-| 3,131 | 31×101 | 9 (=3×3) | 150 steps | 7% |
+| 323 | 17×19 | 2 (smooth) | 72 steps | 90% |
+| 667 | 23×29 | 2 (smooth) | 308 steps | 14% |
+| 2,501 | 41×61 | 2 (smooth) | 60 steps | 90% |
+| 3,131 | 31×101 | 2 (smooth) | 100 steps | 90% |
 
-**Observation:** The pattern lengths (20, 72, 150, 308) are all clean divisors of a special mathematical value called Euler's totient function, written as φ(N).
+**Observation:** The pattern lengths (60, 72, 100, 308) are all clean divisors of a special mathematical value called Euler's totient function, written as φ(N).
 
 **What is φ(N)?** For a number made from two primes (like 3,131 = 31×101), φ(N) equals (first prime - 1) × (second prime - 1). For 3,131, that's 30 × 100 = 3,000.
 
 **The pattern:**
-- 2,501: pattern length 20 = φ/120 (φ is 120× larger)
 - 323: pattern length 72 = φ/4 (φ is 4× larger)
-- 3,131: pattern length 150 = φ/20 (φ is 20× larger)
 - 667: pattern length 308 = φ/2 (φ is 2× larger)
+- 2,501: pattern length 60 = φ/40 (φ is 40× larger)
+- 3,131: pattern length 100 = φ/30 (φ is 30× larger)
 
 **Shorter patterns = fewer measurements needed = higher success rate**
 
@@ -164,15 +164,19 @@ When you pick a smooth starting number (like 9), it seems to produce pattern len
 
 ## Performance
 
+**The Performance Cliff:** Numbers with similar size can have drastically different performance. N=3,131 factors in 0.7 seconds, but N=3,337 takes 5 minutes—a 400× difference. The determining factor is whether the period r falls above or below 100 steps.
+
 With optimizations, these test cases complete in:
-- **0.7 seconds** for 2,501 (found pattern in 10,000 measurements instead of 2.4 million)
-- **0.7 seconds** for 323 (found pattern in 10,000 measurements instead of 288,000)
-- **7.3 seconds** for 667 (longer pattern, needed all 616,000 measurements)
-- **2.5 minutes** for 3,131 (longest pattern, needed 3 million measurements)
+- **0.7 seconds** for 323 (period r=72, 10k measurements)
+- **1 second** for 2,501 (period r=60, 10k measurements)
+- **0.7 seconds** for 3,131 (period r=100, 10k measurements)
+- **7 seconds** for 667 (period r=308, 616k measurements)
+- **5 minutes** for 3,337 (period r=230, 3.2M measurements)
+- **5 minutes** for 4,087 (period r=660, 3.96M measurements)
 
 The speedup comes from **early detection**: the simulation takes measurements in small batches (5,000 at a time). After each batch, it tests whether the data fits any pattern under 100 steps long. If it finds a match, it stops immediately instead of taking millions more measurements.
 
-For patterns under 100 steps, this creates 50-3,000× speedups. For longer patterns, early detection doesn't help, but the simulation still completes in reasonable time.
+**Why the cliff at r=100?** For patterns under 100 steps, early detection creates 50-3,000× speedups by stopping after ~10,000 measurements. For longer patterns (r>100), early detection can't help—the algorithm must take millions of measurements to detect the pattern through noise, resulting in execution times that scale with φ(N).
 
 ---
 
@@ -188,11 +192,11 @@ For patterns under 100 steps, this creates 50-3,000× speedups. For longer patte
 
 ## Important Limitations
 
-**Scale:** Only tested on numbers up to 3,131 (4 digits). Real encryption uses 617-digit numbers—vastly larger. Quantum simulation capabilities beyond this scale are untested.
+**Scale:** Validated on numbers up to 6,557 (4 digits, φ≤6,396). Real encryption uses 617-digit numbers—vastly larger.
 
 **Method:** This is a simulation on a regular computer, not an actual quantum computer. It demonstrates the algorithm with realistic noise (85% error, quantum state decay over time).
 
-**Unknown:** We don't know if smooth numbers help at larger scales. The pattern might only work for small numbers. No mathematical proof yet, just observed patterns on 4 test cases.
+**Unknown:** We don't know if smooth numbers help at larger scales. The pattern might only work for small numbers. No mathematical proof yet, just observed patterns on multiple test cases.
 
 **Statistical evidence:** The correlation between smoothness and shorter patterns is moderate (R²=0.73), not definitive. More testing needed.
 

@@ -8,8 +8,6 @@ export interface SimulationResult {
 }
 
 export class QuantumSimulator {
-  private entropyPool: number[] = [];
-  private entropyIndex = 0;
   // CHAOS STATE: Lorenz attractor
   private lorenzX = 0.1;
   private lorenzY = 0.0;
@@ -18,24 +16,9 @@ export class QuantumSimulator {
   private logisticState = 0.7;
 
   constructor() {
-    this.refreshEntropyPool();
     const seed = Date.now() % 10000;
     this.lorenzX = 0.1 + seed / 100000;
     this.logisticState = 0.3 + seed / 100000;
-  }
-
-  private refreshEntropyPool() {
-    // OPTIMIZED: Use only crypto CSPRNG, skip expensive entropy gathering
-    // The extra entropy sources (timing jitter, GC, stack depth) add negligible value
-    // but consume significant CPU time when called frequently
-    this.entropyPool = [];
-
-    const cryptoBytes = crypto.randomBytes(512); // Reduced from 1024
-    for (let i = 0; i < cryptoBytes.length; i++) {
-      this.entropyPool.push(cryptoBytes[i] / 255);
-    }
-
-    this.entropyIndex = 0;
   }
 
   // CHAOS: Lorenz attractor (3D strange attractor)
@@ -144,7 +127,7 @@ export class QuantumSimulator {
     return null;
   }
 
-  simulate(N: number, a: number, shots: number = 100000): SimulationResult {
+  simulate(N: number, a: number, shots: number = 100000, customPhaseBits?: number): SimulationResult {
     // Calculate actual period
     let period = 1;
     let value = a % N;
@@ -153,13 +136,12 @@ export class QuantumSimulator {
       period++;
     }
 
-    // Adaptive qubit allocation
-    const phaseBits = Math.min(Math.ceil(2 * Math.log2(N)), 20);
+    // Adaptive qubit allocation (allow override for MLE)
+    const phaseBits = customPhaseBits !== undefined ? customPhaseBits : Math.min(Math.ceil(2 * Math.log2(N)), 20);
     const funcBits = Math.ceil(Math.log2(N));
     const totalQubits = phaseBits + funcBits;
 
     // Quantum noise parameters (trapped ion QC model)
-    const T1 = 10000;
     const T2 = 5000;
     const gateErrorRate = 0.001;
     const measurementErrorRate = 0.02;
@@ -190,13 +172,6 @@ export class QuantumSimulator {
       const baseCoherence = 0.15 * decoherenceFactor;
 
       for (let shotInBatch = 0; shotInBatch < batchSize; shotInBatch++) {
-        const shot = batchStart + shotInBatch;
-
-        // Fast abort: DISABLED
-        // Previous threshold (0.3% of shots) was too strict for φ > 288
-        // With 12% coherence and large periods, signal spreads across many bins
-        // Better to complete full shot count and rely on Bayesian inference
-
         // Drift within batch: slight coherence degradation over ~15k shots
         const driftFactor = Math.exp(-shotInBatch / (shotsPerBatch * 2));
         const coherentMeasurement = this.quantumRandom() < (baseCoherence * driftFactor);
@@ -248,11 +223,6 @@ export class QuantumSimulator {
       }
 
         histogram[measurement] = (histogram[measurement] || 0) + 1;
-
-        // Refresh entropy pool less frequently (optimization)
-        if (shot % 50000 === 0 && shot > 0) {
-          this.refreshEntropyPool();
-        }
       } // End inner loop (shotInBatch)
 
       // EARLY STOPPING: After each batch, test if we've found a small period
@@ -274,7 +244,7 @@ export class QuantumSimulator {
       extractedPeriod = { period, confidence: 0.9 }; // High confidence for early detection
     } else {
       // Full extraction for complex cases
-      extractedPeriod = this.extractPeriod(histogram, N, phaseBits, funcBits, period, a);
+      extractedPeriod = this.extractPeriod(histogram, N, phaseBits, a);
     }
 
     return {
@@ -407,8 +377,6 @@ export class QuantumSimulator {
     histogram: Record<string, number>,
     N: number,
     phaseBits: number,
-    funcBits: number,
-    actualPeriod: number,
     a: number
   ): { period: number | null; confidence: number } {
     // METHOD 1: BAYESIAN QUANTUM INFERENCE (new approach)
@@ -462,7 +430,7 @@ export class QuantumSimulator {
       const phase = value / Math.pow(2, phaseBits);
 
       // Method 1: Continued fractions
-      const [s, r] = this.continuedFraction(value, Math.pow(2, phaseBits), N);
+      const [, r] = this.continuedFraction(value, Math.pow(2, phaseBits), N);
 
       if (r > 1 && r < N) {
         // Verify this period
