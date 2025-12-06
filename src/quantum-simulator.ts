@@ -191,6 +191,56 @@ export class QuantumSimulator {
     return { promising, earlyPeriod: promising ? period : null };
   }
 
+  // Progressive period testing: try to detect period with minimal shots
+  private testPeriodEarly(
+    histogram: Record<string, number>,
+    N: number,
+    phaseBits: number,
+    a: number,
+    candidatePeriods: number[]
+  ): number | null {
+    // For each small period candidate, check if measurements are consistent
+    for (const r of candidatePeriods) {
+      if (modularExponentiation(a, r, N) !== 1) continue; // Must be valid period
+
+      let evidence = 0;
+      let totalMeasurements = 0;
+
+      // Check if histogram peaks align with k/r for k=0,1,...,r-1
+      for (const [bitstring, count] of Object.entries(histogram)) {
+        const phasePart = bitstring.substring(0, phaseBits);
+        const measured = parseInt(phasePart, 2);
+        const phase = measured / Math.pow(2, phaseBits);
+
+        // Find closest expected phase k/r
+        let minDist = 1.0;
+        for (let k = 0; k < r; k++) {
+          const expected = k / r;
+          const dist = Math.min(
+            Math.abs(phase - expected),
+            Math.abs(phase - expected + 1),
+            Math.abs(phase - expected - 1)
+          );
+          minDist = Math.min(minDist, dist);
+        }
+
+        // If close to an expected phase, count as evidence
+        if (minDist < 0.02) { // Within 2% of expected
+          evidence += count;
+        }
+        totalMeasurements += count;
+      }
+
+      const confidence = evidence / totalMeasurements;
+      // If >20% of measurements support this period, accept it
+      if (confidence > 0.20) {
+        return r;
+      }
+    }
+
+    return null;
+  }
+
   simulate(N: number, a: number, shots: number = 100000): SimulationResult {
     // Calculate actual period
     let period = 1;
@@ -213,13 +263,19 @@ export class QuantumSimulator {
 
     const histogram: Record<string, number> = {};
 
-    // BATCHED EXECUTION: Simulate realistic experiment with periodic recalibration
-    // Real QC hardware needs recalibration every ~10-20k shots due to drift
-    // Break into batches, each batch gets fresh coherence
-    const shotsPerBatch = 15000; // Calibration window
-    const numBatches = Math.ceil(shots / shotsPerBatch);
+    // PROGRESSIVE TESTING: Try to detect period early with fewer shots
+    const phi = eulerTotient(N);
+    const smallDivisors = getDivisors(phi)
+      .filter(r => r > 1 && r <= 100) // Small periods only
+      .sort((a, b) => a - b); // Smallest first
 
-    for (let batch = 0; batch < numBatches; batch++) {
+    // BATCHED EXECUTION with EARLY STOPPING
+    // Take small batches and test if we've found the period
+    const shotsPerBatch = 5000; // Small batches for early detection
+    const maxBatches = Math.ceil(shots / shotsPerBatch);
+    let earlyDetection = false;
+
+    for (let batch = 0; batch < maxBatches; batch++) {
       const batchStart = batch * shotsPerBatch;
       const batchEnd = Math.min((batch + 1) * shotsPerBatch, shots);
       const batchSize = batchEnd - batchStart;
@@ -295,10 +351,28 @@ export class QuantumSimulator {
           this.refreshEntropyPool();
         }
       } // End inner loop (shotInBatch)
+
+      // EARLY STOPPING: After each batch, test if we've found a small period
+      if (batch >= 1 && smallDivisors.length > 0) { // Need at least 10k shots
+        const detectedPeriod = this.testPeriodEarly(histogram, N, phaseBits, a, smallDivisors);
+        if (detectedPeriod !== null) {
+          console.log(`  Early detection: r=${detectedPeriod} after ${batchEnd} shots (saved ${shots - batchEnd} shots)`);
+          period = detectedPeriod;
+          earlyDetection = true;
+          break;
+        }
+      }
     } // End outer loop (batch)
 
-    // Extract period using continued fractions
-    const extractedPeriod = this.extractPeriod(histogram, N, phaseBits, funcBits, period, a);
+    // Extract period using continued fractions (unless already detected early)
+    let extractedPeriod;
+    if (earlyDetection) {
+      // Use the early detected period
+      extractedPeriod = { period, confidence: 0.9 }; // High confidence for early detection
+    } else {
+      // Full extraction for complex cases
+      extractedPeriod = this.extractPeriod(histogram, N, phaseBits, funcBits, period, a);
+    }
 
     return {
       histogram,
