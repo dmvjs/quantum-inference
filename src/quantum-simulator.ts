@@ -657,11 +657,11 @@ export class QuantumSimulator {
 
     const selectedBases = orderedBases.slice(0, adaptiveAttempts);
 
-    // Split for display
-    const smallBases = selectedBases.filter(x => x < 15);
-    const largeBases = selectedBases.filter(x => x >= 15);
+    // Display selected smooth bases
+    const firstFew = selectedBases.slice(0, Math.min(10, selectedBases.length));
+    const remaining = selectedBases.length > 10 ? `, and ${selectedBases.length - 10} more...` : '';
 
-    console.log(`Middle-Out Chaos: small ${smallBases.join(',')} | large ${largeBases.join(',')}\n`);
+    console.log(`Testing smooth bases: ${firstFew.join(', ')}${remaining}\n`);
 
     for (const a of selectedBases) {
       console.log(`Base a=${a}:`);

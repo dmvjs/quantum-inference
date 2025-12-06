@@ -1,8 +1,42 @@
 # Breaking Numbers: A Quantum Factoring Simulation
 
-**What this does:** Simulates how a quantum computer breaks numbers apart into their prime factors—the building blocks of encryption.
+> **TL;DR:** Working code that shows how quantum computers factor numbers using Shor's algorithm. Includes realistic 85% measurement error. Educational tool for understanding quantum computing, not a threat to encryption (works on 4-digit numbers, real keys are 617+ digits).
 
-**The discovery:** Starting with "smooth" numbers (built only from small primes like 9=3×3 or 15=3×5) produces repeating patterns that are dramatically shorter than expected. This makes quantum factoring up to 3,000× faster on test cases.
+**The discovery:** Smooth numbers (like 9=3×3, 15=3×5) produce short repeating patterns, making quantum factoring up to 3,000× faster.
+
+---
+
+## Quick Start
+
+```bash
+npm install
+npm start 323      # Factor 323 (17×19) - completes in 0.7 seconds
+npm start 2501     # Factor 2,501 (41×61) - completes in 0.7 seconds
+npm start 3131     # Factor 3,131 (31×101) - completes in 2.5 minutes
+```
+
+**What you'll see:**
+
+```
+Quantum Integer Factorization: N = 323
+==================================================
+
+Algorithm: Shor's period-finding with adaptive multi-basis search
+Parameters: 16 bases, 288k shots/basis
+
+Testing smooth bases: 15, 14, 10, 9...
+
+Base a=15:
+  Early detection: r=72 after 10000 shots (saved 278000 shots)
+  Period detected: r=72 (confidence: 90.000%)
+  Factor extraction: gcd(305-1, 323) = 19
+
+==================================================
+Result: 323 = 19 × 17 (found in 1 attempt)
+Verification: 19 × 17 = 323 ✓
+```
+
+The simulation tries smooth starting numbers, takes quantum measurements with noise, detects repeating patterns, and extracts factors.
 
 ---
 
@@ -128,7 +162,7 @@ When you pick a smooth starting number (like 9), it seems to produce pattern len
 
 ---
 
-## How Fast Is It?
+## Performance
 
 With optimizations, these test cases complete in:
 - **0.7 seconds** for 2,501 (found pattern in 10,000 measurements instead of 2.4 million)
@@ -139,19 +173,6 @@ With optimizations, these test cases complete in:
 The speedup comes from **early detection**: the simulation takes measurements in small batches (5,000 at a time). After each batch, it tests whether the data fits any pattern under 100 steps long. If it finds a match, it stops immediately instead of taking millions more measurements.
 
 For patterns under 100 steps, this creates 50-3,000× speedups. For longer patterns, early detection doesn't help, but the simulation still completes in reasonable time.
-
----
-
-## Try It Yourself
-
-```bash
-npm install
-npm start 323      # Factor 323 (17×19) using quantum simulation
-npm start 2501     # Factor 2,501 (41×61)
-npm start 3131     # Factor 3,131 (31×101)
-```
-
-You'll see the quantum computer working through different smooth starting numbers, taking measurements in batches, and eventually finding the pattern that reveals the factors.
 
 ---
 
@@ -190,7 +211,7 @@ You'll see the quantum computer working through different smooth starting number
 **Smart optimizations:**
 - **Progressive pattern testing:** Tests short pattern lengths first (divisors of φ under 100), stops immediately when found
 - **Efficient measurement allocation:** Scales measurements linearly with problem size (not exponentially)
-- **Smooth number selection:** Tests simple starting bases first (9, 12, 15...) before trying random numbers
+- **Smooth number selection:** Tests simple starting bases first (9, 15, 12, 14...) before trying random numbers
 - **Statistical inference:** Uses Bayesian statistics to find patterns in noisy measurements, constrained to likely divisors of φ(N)
 
 The simulation includes realistic quantum computer behavior: random measurement errors and quantum coherence decay, matching what you'd see on current quantum hardware.

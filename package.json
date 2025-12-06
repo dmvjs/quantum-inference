@@ -1,9 +1,26 @@
 {
   "name": "quantum-factoring",
   "version": "1.0.0",
-  "description": "Shor's algorithm with realistic noise",
+  "description": "Educational quantum factoring simulation with realistic NISQ noise. Demonstrates Shor's algorithm and smooth basis optimization on small semiprimes.",
   "main": "dist/index.js",
   "type": "module",
+  "keywords": [
+    "quantum-computing",
+    "shor-algorithm",
+    "quantum-simulation",
+    "factorization",
+    "cryptography",
+    "nisq",
+    "quantum-algorithms",
+    "educational",
+    "typescript"
+  ],
+  "author": "Elliott",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmvjs/quantum-factoring.git"
+  },
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --expose-gc dist/index.js",
