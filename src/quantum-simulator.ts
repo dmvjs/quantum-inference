@@ -233,12 +233,10 @@ export class QuantumSimulator {
       for (let shotInBatch = 0; shotInBatch < batchSize; shotInBatch++) {
         const shot = batchStart + shotInBatch;
 
-        // Fast abort: check confidence at 25%, 50% marks (disabled for φ < 300)
-        const phi = eulerTotient(N);
-        if (phi >= 300 && (shot === Math.floor(shots * 0.25) || shot === Math.floor(shots * 0.5))) {
-          const maxCount = Math.max(...Object.values(histogram).slice(0, 10000), 1); // Avoid stack overflow
-          if (maxCount < shot * 0.003) return { histogram, period: null, confidence: 0 };
-        }
+        // Fast abort: DISABLED
+        // Previous threshold (0.3% of shots) was too strict for φ > 288
+        // With 12% coherence and large periods, signal spreads across many bins
+        // Better to complete full shot count and rely on Bayesian inference
 
         // Drift within batch: slight coherence degradation over ~15k shots
         const driftFactor = Math.exp(-shotInBatch / (shotsPerBatch * 2));
@@ -583,7 +581,7 @@ export class QuantumSimulator {
     // Need shots ∝ r^2 to maintain constant SNR as period grows
     // Use φ(N) as proxy for maximum expected period
     const shotsPerBasis = Math.min(
-      600000,  // Cap at 600k for runtime (still ~2x our previous max)
+      2400000,  // Cap at 2.4M for φ ≤ 576 (4× higher, following φ² scaling)
       Math.max(
         100000,  // Minimum 100k shots for small numbers
         Math.floor(100000 * Math.pow(phi / 100, 2.0))  // Quadratic scaling with φ
