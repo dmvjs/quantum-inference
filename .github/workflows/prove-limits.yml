@@ -1,0 +1,47 @@
+name: Prove Extreme Limits
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  prove-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - { n: 3379, phi: 3240, name: "Record: φ=3240" }
+          - { n: 3131, phi: 3000, name: "φ=3000 (φ/20)" }
+          - { n: 3007, phi: 2880, name: "φ=2880 (φ/6)" }
+          - { n: 2501, phi: 2400, name: "φ=2400 (φ/20)" }
+
+    name: ${{ matrix.test.name }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Factor N=${{ matrix.test.n }}
+        run: |
+          echo "Testing boundary case: N=${{ matrix.test.n }} (φ=${{ matrix.test.phi }})"
+          timeout 300 npm start ${{ matrix.test.n }} || exit 1
+
+      - name: Verify success
+        run: |
+          echo "✓ Successfully factored N=${{ matrix.test.n }} at φ=${{ matrix.test.phi }}"
