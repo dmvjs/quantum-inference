@@ -1,0 +1,16 @@
+{
+  "name": "quantum-factoring",
+  "version": "1.0.0",
+  "description": "Shor's algorithm with realistic noise",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node --expose-gc dist/index.js",
+    "verify": "tsc && node --expose-gc dist/verify.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
