@@ -31,7 +31,9 @@ npm run verify     # Test suite (21,42,97,143,221,667)
 
 ## Why it fails at 667
 
-N > 200 → signal drowns in noise. Period is too large (r>100), quantum state decoheres before measurement captures enough information. This is the fundamental limit of noisy quantum computers today.
+Quantum computers are noisy: qubits decohere in milliseconds, gates have 0.1% error rate, measurements have 2% error rate. For small numbers (21, 143), the signal is stronger than the noise. For large numbers (667), noise drowns out the signal completely.
+
+**This is why encryption is safe**: RSA uses 617-digit numbers. Current quantum computers can't even factor 3-digit numbers reliably. We're ~20,000x away from breaking real encryption.
 
 ## Example output
 
