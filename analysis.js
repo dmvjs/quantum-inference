@@ -1,5 +1,5 @@
 // Analysis: Smoothness vs Period Reduction
-// Makes the Elliott discovery obvious and tractable
+// Statistical analysis of period divisor patterns
 
 const cases = [
   { N: 323, phi: 288, base: 15, period: 144, factors: [17, 19] },
@@ -43,7 +43,7 @@ function factorize(n) {
 }
 
 console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('ELLIOTT DISCOVERY: Smoothness → Period Divisors');
+console.log('Smoothness Analysis: Period Divisor Patterns');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
 console.log('Base Decomposition & Period Reduction:\n');
@@ -90,11 +90,11 @@ cases.forEach(c => {
   const actualShots = Math.pow(c.period, 2);
   const savings = (naiveShots / actualShots).toFixed(1);
 
-  console.log(`N=${c.N.toString().padStart(4)} | Naive: ${(naiveShots/1e6).toFixed(1).padStart(5)}M shots | Elliott: ${(actualShots/1e6).toFixed(2).padStart(5)}M shots | ${savings}× reduction`);
+  console.log(`N=${c.N.toString().padStart(4)} | Naive: ${(naiveShots/1e6).toFixed(1).padStart(5)}M shots | Smooth: ${(actualShots/1e6).toFixed(2).padStart(5)}M shots | ${savings}× reduction`);
 });
 
 console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('THE DISCOVERY');
+console.log('SUMMARY');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
 const avgReduction = cases.reduce((sum, c) => sum + (c.phi / c.period), 0) / cases.length;
