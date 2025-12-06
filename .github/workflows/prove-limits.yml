@@ -27,6 +27,7 @@ jobs:
           - { n: 3337, phi: 3220, reduction: "φ/14" }
           - { n: 4087, phi: 3960, reduction: "φ/6" }
           - { n: 6557, phi: 6396, reduction: "φ/2" }
+          - { n: 10403, phi: 10200, reduction: "φ/2" }
 
     name: "N=${{ matrix.test.n }} φ=${{ matrix.test.phi }} (${{ matrix.test.reduction }})"
 
@@ -63,7 +64,7 @@ jobs:
     steps:
       - run: |
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "✓ All 10 test cases validated"
-          echo "✓ φ(N) ≤ 6396 proven at 85% noise"
+          echo "✓ All 11 test cases validated"
+          echo "✓ φ(N) ≤ 10200 proven at 85% noise"
           echo "✓ Smooth bases produce short periods"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

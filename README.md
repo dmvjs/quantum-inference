@@ -192,7 +192,7 @@ The speedup comes from **early detection**: the simulation takes measurements in
 
 ## Important Limitations
 
-**Scale:** Validated on numbers up to 6,557 (4 digits, φ≤6,396). Real encryption uses 617-digit numbers—vastly larger.
+**Scale:** Validated on numbers up to 10,403 (5 digits, φ≤10,200). Real encryption uses 617-digit numbers—vastly larger.
 
 **Method:** This is a simulation on a regular computer, not an actual quantum computer. It demonstrates the algorithm with realistic noise (85% error, quantum state decay over time).
 
