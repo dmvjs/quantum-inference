@@ -16,12 +16,21 @@ Why: Smooth bases like 18=2×3², 24=2³×3 have short orders (~100-150) → str
 
 ## Results
 
-| Range | Success | Time |
-|-------|---------|------|
-| 21-899 | **100%** | 2-5s |
-| 1003+ | 0% | — |
+**Before batched execution** (naive shot-based decoherence):
+| Number | Factors | φ(N) | Success | Issue |
+|--------|---------|------|---------|-------|
+| 177 | 3×59 | 116 | 0/5 (0%) | Only ~780 coherent shots |
+| 237 | 3×79 | 156 | 0/5 (0%) | < 1% coherence by shot 100k |
+| 335 | 5×67 | 264 | 0/5 (0%) | exp(-shot/T₂) → 0% |
 
-Hard limit at ~1000 where period > 200 exceeds our shot budget at this noise level.
+**After batched execution** (realistic calibration model):
+| Number | Factors | Period | Confidence | Time | Result |
+|--------|---------|--------|------------|------|--------|
+| 177 | 3×59 | 116 | 49.2% | 1.2s | ✅ 1/1 |
+| 237 | 3×79 | 156 | 33.9% | 2.1s | ✅ 1/1 |
+| 335 | 5×67 | 132 | 18.6% | 4.8s | ✅ 1/1 |
+
+**Overall**: 21-899 deterministic, ~1000+ hits noise limit (φ > 400)
 
 ## Noise Model (Realistic)
 
