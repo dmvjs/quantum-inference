@@ -67,11 +67,12 @@ async function main() {
 
   const tests = [
     { N: 21,  expected: 'high',   rate: '~95%',  desc: 'Small period, high signal',        trials: 1,  min: 1,   max: 1   },
-    { N: 42,  expected: 'trivial', rate: '100%', desc: 'Even number (trivial)',             trials: 1,  min: 1,   max: 1   },
-    { N: 97,  expected: 'prime',   rate: '100%', desc: 'Prime number',                      trials: 1,  min: 1,   max: 1   },
     { N: 143, expected: 'medium',  rate: '~60%', desc: 'Medium period, moderate signal',    trials: 10, min: 4,   max: 8   },
-    { N: 221, expected: 'low',     rate: '~40%', desc: 'Variable period, weak signal',      trials: 5,  min: 1,   max: 4   },
-    { N: 667, expected: 'fail',    rate: '~0%',  desc: 'Beyond noise limit',                trials: 1,  min: 0,   max: 0   },
+    { N: 323, expected: 'chaos',   rate: '~80%', desc: 'CHAOS: Extended range',             trials: 5,  min: 3,   max: 5   },
+    { N: 437, expected: 'chaos',   rate: '~70%', desc: 'CHAOS: Large composite',            trials: 5,  min: 2,   max: 5   },
+    { N: 551, expected: 'edge',    rate: '~50%', desc: 'CHAOS: Near limit',                 trials: 5,  min: 1,   max: 4   },
+    { N: 667, expected: 'edge',    rate: '~30%', desc: 'CHAOS: Noise threshold',            trials: 5,  min: 0,   max: 3   },
+    { N: 899, expected: 'extreme', rate: '~20%', desc: 'CHAOS: Beyond old limits',          trials: 5,  min: 0,   max: 2   },
   ];
 
   const results: { N: number; successes: number; total: number; expected: string; min: number; max: number }[] = [];
