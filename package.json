@@ -26,6 +26,8 @@
     "compare-baselines": "tsc && node --expose-gc dist/baselines/compare.js",
     "validate": "tsc && node --expose-gc dist/validate-framework.js",
     "test-progressive": "tsc && node --expose-gc dist/test-progressive.js",
+    "scaling": "tsc && node --expose-gc dist/scaling-validation.js",
+    "scaling-deep": "tsc && node --expose-gc dist/scaling-analysis-deep.js",
     "build": "tsc"
   },
   "devDependencies": {
