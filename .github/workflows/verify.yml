@@ -1,4 +1,4 @@
-name: Quantum Factoring CI
+name: Framework Validation
 
 on:
   push:
@@ -7,8 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
-  verify:
+  validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@v4
@@ -19,11 +20,13 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Build
       run: npm run build
 
-    - name: Run verification suite
-      run: npm run verify
-      timeout-minutes: 30
+    - name: Run validation suite
+      run: npm run validate
+
+    - name: Run baseline comparisons
+      run: npm run compare-baselines
