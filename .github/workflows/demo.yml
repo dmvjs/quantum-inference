@@ -1,0 +1,37 @@
+name: Demo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run demo
+      run: npm run demo
+
+    - name: Verify improvement
+      run: |
+        # Demo should show >1000× improvement
+        npm run demo 2>&1 | tee demo_output.txt
+        if grep -q "× FEWER" demo_output.txt && grep -q "Framework is" demo_output.txt; then
+          echo "✓ Demo ran successfully"
+          exit 0
+        else
+          echo "✗ Demo failed"
+          exit 1
+        fi

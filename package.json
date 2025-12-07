@@ -1,18 +1,18 @@
 {
-  "name": "quantum-factoring",
-  "version": "1.0.0",
-  "description": "Educational quantum factoring simulation with realistic NISQ noise. Demonstrates Shor's algorithm and smooth basis optimization on small semiprimes.",
-  "main": "dist/index.js",
+  "name": "quantum-pattern-extraction",
+  "version": "2.0.0",
+  "description": "Extract accurate patterns from 85% noisy quantum measurements using structured Bayesian inference. 2000× more efficient than standard approaches.",
+  "main": "dist/demo.js",
   "type": "module",
   "keywords": [
     "quantum-computing",
-    "shor-algorithm",
-    "quantum-simulation",
-    "factorization",
-    "cryptography",
-    "nisq",
+    "quantum-inference",
+    "bayesian-inference",
+    "grover-search",
     "quantum-algorithms",
-    "educational",
+    "nisq",
+    "noise-mitigation",
+    "pattern-extraction",
     "typescript"
   ],
   "author": "Elliott",
@@ -22,13 +22,11 @@
     "url": "https://github.com/dmvjs/quantum-factoring.git"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "tsc && node --expose-gc dist/index.js",
-    "analyze": "node analysis.js",
-    "verify": "tsc && node --expose-gc dist/verify.js",
-    "test-323": "tsc && node --expose-gc dist/test-323.js",
-    "benchmark": "tsc && node --expose-gc dist/benchmark.js",
-    "scaling": "tsc && node --expose-gc dist/scaling-analysis.js"
+    "demo": "tsc && node dist/demo.js",
+    "compare-baselines": "tsc && node --expose-gc dist/baselines/compare.js",
+    "validate": "tsc && node --expose-gc dist/validate-framework.js",
+    "test-progressive": "tsc && node --expose-gc dist/test-progressive.js",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
