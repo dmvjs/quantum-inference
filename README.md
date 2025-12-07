@@ -210,6 +210,19 @@ const result = framework.inferProgressive(
 
 ---
 
+## Related Work
+
+This implements Bayesian quantum amplitude estimation techniques, building on:
+
+- **Wiebe & Granade (2016)**: Efficient Bayesian phase estimation - foundational work on Bayesian methods for quantum phase estimation
+- **Suzuki et al. (2020)**: [Amplitude estimation without phase estimation](https://link.springer.com/article/10.1007/s11128-019-2565-2) - maximum likelihood estimation for quantum amplitude estimation
+- **Wang et al. (2021)**: [Foundations for Bayesian inference with engineered likelihood functions](https://journals.aps.org/prxquantum/abstract/10.1103/PRXQuantum.2.010346) - robust amplitude estimation using Bayesian inference (PRX Quantum)
+- **Ramôa & Santos (2024)**: [Bayesian Quantum Amplitude Estimation](https://arxiv.org/abs/2412.04394) - noise-aware Bayesian algorithm with adaptive measurement and progressive posterior updates
+
+**Our contribution** is a systematic evaluation across multiple algorithms (Grover, QPE, Shor) showing where these techniques are highly effective (Grover: ~2000× improvement), moderately effective (QPE: ~2×), and ineffective (Shor: no improvement). This empirical analysis reveals that Bayesian QAE benefits are limited to problems with small, enumerable hypothesis spaces.
+
+---
+
 ## Citation
 
 ```bibtex
