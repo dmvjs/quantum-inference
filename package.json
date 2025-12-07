@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dmvjs/quantum-factoring.git"
+    "url": "https://github.com/dmvjs/quantum-inference.git"
   },
   "scripts": {
     "demo": "tsc && node dist/demo.js",

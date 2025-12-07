@@ -1,6 +1,6 @@
 # Quantum Pattern Extraction Framework
 
-> **Observation:** In our simulations, structured Bayesian inference extracts accurate results from 85% noisy quantum measurements using 2000× fewer samples than naive frequency counting.
+> **Observation:** In our simulations, structured Bayesian inference extracts accurate results from 85% noisy quantum measurements using 2000× fewer samples than naive frequency counting **for Grover's search**. Effectiveness varies by problem: highly effective for discrete search (2000×), moderately effective for phase estimation (2×), not effective for Shor's factoring (1×).
 
 ```bash
 npm install
@@ -70,11 +70,27 @@ Combine Bayesian inference, frequency analysis, and validation checks for robust
 
 | Algorithm | Problem | Naive | Framework | Improvement |
 |-----------|---------|-------|-----------|-------------|
-| **Grover Search** | N=16, target=9 | 50k shots | 22 shots | 2273× |
-| **Phase Estimation** | θ=0.375, 8 bits | 50k shots | 22k shots | 2.3× |
-| **Shor Factoring** | N=323, a=2 | 50k shots | 10k shots | 5× |
+| **Grover Search** | N=16, target=9 | 50k shots | ~20 shots | **~2000×** |
+| **Phase Estimation** | θ=0.375, 8 bits | 50k shots | 22k shots | **2.3×** |
+| **Shor Factoring** | N=323, a=2 | 50k shots | 50k shots | **1× (no improvement)** |
 
 **All tests:** 85% depolarizing noise, simulated quantum measurements
+
+### Where This Framework Is Most Effective
+
+**Highly effective (1000×+ improvement):**
+- Grover's search and similar discrete database search problems
+- Algorithms with small, enumerable hypothesis spaces
+- Problems where the answer is a single element from a known set
+
+**Moderately effective (2-10× improvement):**
+- Quantum phase estimation with structured phase values
+- Algorithms with continuous but bounded parameter spaces
+
+**Not effective (<2× improvement):**
+- Shor's algorithm for factoring (already has efficient early stopping)
+- Algorithms with very large or unstructured output spaces
+- Problems where naive frequency counting already works well
 
 **Baselines tested:**
 - Naive maximum likelihood (frequency counting)
@@ -125,15 +141,17 @@ Combine Bayesian inference, frequency analysis, and validation checks for robust
 ## Claims We Make
 
 ✅ **We claim:**
-- In our simulations, this approach uses 2000× fewer measurements than naive baselines
-- The framework transfers across different quantum algorithms (Grover, QPE, Shor)
-- Progressive Bayesian inference with structured priors outperforms standard techniques in simulation
+- In our simulations, this approach uses **2000× fewer measurements for Grover's search** with 85% noise
+- The framework is **highly effective for discrete search problems** (1000×+ improvement)
+- The framework is **moderately effective for phase estimation** (~2× improvement)
+- The framework is **not effective for Shor's factoring** (no improvement over early stopping)
+- Progressive Bayesian inference with structured priors outperforms standard techniques **when the hypothesis space is small and enumerable**
 - The code is reproducible and well-documented
 
 ❌ **We do NOT claim:**
+- Universal applicability across all quantum algorithms (effectiveness varies by problem structure)
 - Theoretical optimality (no formal proof)
 - Real hardware validation (simulation only so far)
-- Universal applicability (tested on limited problem set)
 - Better than all possible approaches (only compared to standard baselines)
 - "Revolutionary" or "breakthrough" (let others judge)
 
@@ -200,7 +218,7 @@ const result = framework.inferProgressive(
   author = {Elliott},
   year = {2025},
   note = {Simulation results show 2000× measurement reduction vs. naive baselines},
-  url = {https://github.com/dmvjs/quantum-factoring}
+  url = {https://github.com/dmvjs/quantum-inference}
 }
 ```
 
