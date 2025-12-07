@@ -115,7 +115,7 @@ Combine Bayesian inference, frequency analysis, and validation checks for robust
 - Structured inference could be a standard error mitigation technique
 
 **Key questions for validation:**
-1. Real hardware test on IBM/Rigetti/IonQ devices
+1. Real hardware test on IonQ devices
 2. Scaling experiments to larger problem sizes
 3. Comparison against state-of-the-art error mitigation
 4. Theoretical analysis of sample complexity bounds
@@ -173,7 +173,7 @@ const result = framework.inferProgressive(
 ## Future Work
 
 ### Immediate Next Steps:
-1. **Real hardware validation** - Test on IBM Quantum, Rigetti, IonQ
+1. **Real hardware validation** - Test on IonQ hardware
 2. **Scaling experiments** - Larger problem sizes (N > 1000)
 3. **Noise model refinement** - Non-depolarizing, correlated errors
 4. **Theoretical analysis** - Prove sample complexity bounds
